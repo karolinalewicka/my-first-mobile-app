@@ -42,31 +42,34 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
 
         for (i in buttons.indices) {
             for (j in buttons[i].indices) {
-                if (view == buttons[i][j]) {
-                    if (player1Turn) {
-                        view.text = "X"
-                        boardStatus[i][j] = 1
-                    } else {
-                        view.text = "O"
-                        boardStatus[i][j] = 2
-                    }
-                    roundCount++
-
-                    if (checkForWin()) {
-                        if (player1Turn) {
-                            announceWinner("Player 1 wins!")
-                        } else {
-                            announceWinner("Player 2 wins!")
-                        }
-                    } else if (roundCount == 9) {
-                        announceWinner("It's a draw!")
-                    } else {
-                        player1Turn = !player1Turn
-                    }
+                if (view != buttons[i][j]) {
+                    continue
                 }
+
+                val player = if (player1Turn) 1 else 2
+                val symbol = if (player1Turn) "X" else "O"
+
+                view.text = symbol
+                boardStatus[i][j] = player
+                roundCount++
+
+                if (checkForWin()) {
+                    val winnerText = "Player $player wins!"
+                    announceWinner(winnerText)
+                    return
+                }
+
+                if (roundCount == 9) {
+                    announceWinner("It's a draw!")
+                    return
+                }
+
+                player1Turn = !player1Turn
+                return
             }
         }
     }
+
 
 
     private fun checkForWin(): Boolean {
