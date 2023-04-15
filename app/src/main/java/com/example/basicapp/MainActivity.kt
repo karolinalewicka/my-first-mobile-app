@@ -13,8 +13,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val btnGoToSecondActivity = findViewById<Button>(R.id.btn_go_to_second_activity)
-        btnGoToSecondActivity.setOnClickListener {
+        val goToSecondActivityButton = findViewById<Button>(R.id.go_to_second_activity_button)
+        goToSecondActivityButton.setOnClickListener {
             val intent = Intent(this, SecondActivity::class.java)
             startActivity(intent)
         }
