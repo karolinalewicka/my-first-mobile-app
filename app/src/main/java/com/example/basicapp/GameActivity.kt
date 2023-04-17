@@ -40,60 +40,80 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
             return
         }
 
+        val (row, col) = getButtonPosition(view)
+
+        val player = if (player1Turn) 1 else 2
+        val symbol = if (player1Turn) "X" else "O"
+
+        view.text = symbol
+        boardStatus[row][col] = player
+        roundCount++
+
+        if (checkForWin()) {
+            announceWinner(player)
+            return
+        }
+
+        if (roundCount == 9) {
+            announceWinner(0)
+            return
+        }
+
+        player1Turn = !player1Turn
+    }
+
+    private fun getButtonPosition(button: Button): Pair<Int, Int> {
         for (i in buttons.indices) {
             for (j in buttons[i].indices) {
-                if (view != buttons[i][j]) {
-                    continue
+                if (button == buttons[i][j]) {
+                    return Pair(i, j)
                 }
-
-                val player = if (player1Turn) 1 else 2
-                val symbol = if (player1Turn) "X" else "O"
-
-                view.text = symbol
-                boardStatus[i][j] = player
-                roundCount++
-
-                if (checkForWin()) {
-                    val winnerText = "Player $player wins!"
-                    announceWinner(winnerText)
-                    return
-                }
-
-                if (roundCount == 9) {
-                    announceWinner("It's a draw!")
-                    return
-                }
-
-                player1Turn = !player1Turn
-                return
             }
         }
+        throw IllegalArgumentException("Button not found")
     }
+
 
 
 
     private fun checkForWin(): Boolean {
+        // Check rows and columns
         for (i in 0..2) {
-            if (boardStatus[i][0] == boardStatus[i][1] && boardStatus[i][0] == boardStatus[i][2] && boardStatus[i][0] != 0) {
-                return true
+            if (boardStatus[i][0] != 0 && boardStatus[i][0] == boardStatus[i][1] && boardStatus[i][1] == boardStatus[i][2]) {
+                return true // row win
             }
-            if (boardStatus[0][i] == boardStatus[1][i] && boardStatus[0][i] == boardStatus[2][i] && boardStatus[0][i] != 0) {
-                return true
+            if (boardStatus[0][i] != 0 && boardStatus[0][i] == boardStatus[1][i] && boardStatus[1][i] == boardStatus[2][i]) {
+                return true // column win
             }
         }
-        if (boardStatus[0][0] == boardStatus[1][1] && boardStatus[0][0] == boardStatus[2][2] && boardStatus[0][0] != 0) {
-            return true
+
+        // Check diagonals
+        if (boardStatus[1][1] != 0) {
+            if (boardStatus[0][0] == boardStatus[1][1] && boardStatus[1][1] == boardStatus[2][2]) {
+                return true // diagonal win
+            }
+            if (boardStatus[0][2] == boardStatus[1][1] && boardStatus[1][1] == boardStatus[2][0]) {
+                return true // diagonal win
+            }
         }
-        if (boardStatus[0][2] == boardStatus[1][1] && boardStatus[0][2] == boardStatus[2][0] && boardStatus[0][2] != 0) {
-            return true
-        }
-        return false
+
+        return false // no win
     }
 
-    private fun announceWinner(winnerText: String) {
-        Toast.makeText(this, winnerText, Toast.LENGTH_SHORT).show()
+
+
+    private fun announceWinner(winningPlayer: Int) {
+        if (winningPlayer == 0) {
+            Toast.makeText(this, "Nobody wins! :(", Toast.LENGTH_SHORT).show()
+        } else {
+            val winningSymbol = if (winningPlayer == 1) "X" else "O"
+            val winnerText = "Player $winningPlayer ($winningSymbol) wins!"
+            Toast.makeText(this, winnerText, Toast.LENGTH_SHORT).show()
+        }
         resetBoard()
     }
+
+
 
     private fun resetBoard() {
         for (i in 0..2) {
